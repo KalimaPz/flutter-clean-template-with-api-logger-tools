@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
         ),
         builder: EasyLoading.init(),
         home: const Home(title: 'Flutter Demo Home Page'),
+        // home: const LogView(),
       ),
     );
   }

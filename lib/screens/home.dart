@@ -1,4 +1,5 @@
 import 'package:arainii_app_template/api_services.dart';
+import 'package:arainii_app_template/utils/log_view.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -14,10 +15,11 @@ class _HomeState extends State<Home> {
   int _counter = 0;
 
   void _incrementCounter() {
-    ApiService.getJsonPlaceHolder();
-    setState(() {
-      _counter++;
-    });
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LogView(),
+        ));
   }
 
   @override
