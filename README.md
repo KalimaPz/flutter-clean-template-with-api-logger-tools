@@ -1,4 +1,4 @@
-# arainii_app_template
+# Clean Code Template with Api Logger
 
 A new Flutter project.
 
