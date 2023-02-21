@@ -20,8 +20,10 @@ BoxDecoration getBoxDecoration(int? statusCode) {
 }
 
 class Log extends StatelessWidget {
+  final int index;
   final CommonResponse commonResponse;
   const Log(
+    this.index,
     this.commonResponse, {
     super.key,
   });
@@ -43,6 +45,10 @@ class Log extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text("${index + 1}."),
+              const SizedBox(
+                width: 10,
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                 decoration: getBoxDecoration(commonResponse.statusCode),
@@ -75,7 +81,19 @@ class Log extends StatelessWidget {
               Text(commonResponse.responseTime),
               const Spacer(),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  final Map<String, dynamic> content = {
+                    "path": commonResponse.path,
+                    "method": commonResponse.method,
+                    "body": commonResponse.body,
+                    "statusCode": commonResponse.statusCode,
+                    "response_time": commonResponse.responseTime,
+                    "response": commonResponse.response
+                  };
+
+                  final String prettierJson = Tools.prettierJson(content);
+                  Tools.textCpy(context, prettierJson);
+                },
                 child: const Icon(
                   Icons.copy,
                 ),
@@ -132,66 +150,121 @@ class LogDetail extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                    decoration: getBoxDecoration(commonResponse.statusCode),
-                    child: Text("${commonResponse.statusCode}",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: commonResponse.statusCode == 200
-                                ? Colors.green[800]
-                                : Colors.red[800])),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 5),
+                        decoration: getBoxDecoration(commonResponse.statusCode),
+                        child: Text("${commonResponse.statusCode}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: commonResponse.statusCode == 200
+                                    ? Colors.green[800]
+                                    : Colors.red[800])),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text('${commonResponse.method}'),
+                      Expanded(child: Text(' : ${commonResponse.path}'))
+                    ],
                   ),
-                  const SizedBox(
-                    width: 10,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[900],
+                              elevation: 0,
+                            ),
+                            onPressed: commonResponse.response == null
+                                ? null
+                                : () {
+                                    Tools.textCpy(
+                                        context,
+                                        Tools.prettierJson(
+                                            commonResponse.response ?? {}));
+                                  },
+                            icon: const Icon(Icons.copy),
+                            label: const Text("Response")),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                            onPressed: commonResponse.body == null
+                                ? null
+                                : () {
+                                    Tools.textCpy(
+                                        context,
+                                        Tools.prettierJson(
+                                            commonResponse.body ?? {}));
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[900],
+                              elevation: 0,
+                            ),
+                            icon: const Icon(Icons.copy),
+                            label: const Text("Body")),
+                      ),
+                    ],
                   ),
-                  Text('${commonResponse.method}'),
-                  Expanded(child: Text(' : ${commonResponse.path}'))
+                  Row(
+                    children: const [
+                      Expanded(child: Divider()),
+                    ],
+                  )
                 ],
               ),
             ),
-            if (commonResponse.body != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                margin: const EdgeInsets.symmetric(vertical: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Request Body : ",
-                      style: TextStyle(fontWeight: FontWeight.w600),
+            Flexible(
+                child: ListView(
+              children: [
+                if (commonResponse.body != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    margin: const EdgeInsets.symmetric(vertical: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Request Body : ",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(Tools.prettierJson(commonResponse.body ?? {},
+                            enableLog: false))
+                      ],
                     ),
-                    const SizedBox(
-                      height: 10,
+                  ),
+                if (commonResponse.response != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    margin: const EdgeInsets.symmetric(vertical: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Response : ",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(Tools.prettierJson(commonResponse.response ?? {},
+                            enableLog: false))
+                      ],
                     ),
-                    Text(Tools.prettierJson(commonResponse.body ?? {},
-                        enableLog: false))
-                  ],
-                ),
-              ),
-            if (commonResponse.response != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                margin: const EdgeInsets.symmetric(vertical: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Response : ",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(Tools.prettierJson(commonResponse.response ?? {},
-                        enableLog: false))
-                  ],
-                ),
-              ),
+                  ),
+              ],
+            )),
           ],
         ),
       ),
@@ -233,7 +306,7 @@ class _LogViewState extends State<LogView> {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(10.0),
-            child: Log(logs[index]),
+            child: Log(index, logs[index]),
           );
         },
       ),
