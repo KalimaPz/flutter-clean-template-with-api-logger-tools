@@ -78,7 +78,7 @@ class Log extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(commonResponse.responseTime),
+              Text(commonResponse.responseTime.toString()),
               const Spacer(),
               InkWell(
                 onTap: () {

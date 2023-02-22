@@ -5,66 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 const int timeout = 30; // in second
-List<CommonResponse> logGroup = [
-  CommonResponse(
-      path: "api/v1/orch-get_personal-receipt-information",
-      method: "GET",
-      statusCode: 200,
-      responseTime: DateTime.now().toIso8601String(),
-      response: {
-        "code": 1000,
-        "data": [],
-      }),
-  CommonResponse(
-      path: "api/v1/orch-create-customer-prize-redeem-channel",
-      method: "POST",
-      statusCode: 400,
-      responseTime: DateTime.now().toIso8601String(),
-      response: null),
-  CommonResponse(
-      path: "api/v1/orch-create-customer-prize-redeem-channel",
-      method: "POST",
-      body: {
-        "name": "test",
-        "desc": "lorem ipsum ",
-      },
-      statusCode: 200,
-      responseTime: DateTime.now().toIso8601String(),
-      response: {"code": 1000, "data": "create success"}),
-  CommonResponse(
-      path: "api/v1/delete_data",
-      method: "DELETE",
-      statusCode: 200,
-      responseTime: DateTime.now().toIso8601String(),
-      response: {
-        "code": 1000,
-        "data": "Delete Complete",
-      }),
-  CommonResponse(
-      path: "api/v1/create_bill",
-      method: "POST",
-      statusCode: 404,
-      responseTime: DateTime.now().toIso8601String(),
-      response: null),
-  CommonResponse(
-      path: "api/v1/update_bill",
-      method: "PUT",
-      statusCode: 500,
-      responseTime: DateTime.now().toIso8601String(),
-      response: null),
-  CommonResponse(
-      path: "api/v1/get_cost",
-      method: "GET",
-      statusCode: 200,
-      responseTime: DateTime.now().toIso8601String(),
-      response: {
-        "code": 5000,
-        "error_data": {
-          "err_title": "Cannot Calculate",
-          "err_desc": "Error",
-        }
-      }),
-];
+List<CommonResponse> logGroup = [];
 
 class ApiService {
   static Dio dioClient = Dio();
@@ -92,6 +33,8 @@ class ApiService {
             method: response.requestOptions.method,
             statusCode: response.statusCode,
             response: response.data,
+            responseTime: DateTime.now().toIso8601String(),
+            body: response.requestOptions.data,
           );
 
           logGroup.add(commonResponse);
@@ -104,6 +47,8 @@ class ApiService {
           method: err.requestOptions.method,
           statusCode: err.response?.statusCode,
           response: err.response?.data,
+          responseTime: DateTime.now().toIso8601String(),
+          body: err.response?.requestOptions.data,
         );
         logGroup.add(commonResponse);
         handler.reject(err);
@@ -118,6 +63,19 @@ class ApiService {
       return servicesRes.data;
     } else {
       throw Exception("ERROR");
+    }
+  }
+
+  static Future<dynamic> getMockData(int code) async {
+    try {
+      final servicesRes = await dioClient.get('/get_mock?status=$code');
+      if (servicesRes.statusCode == 200) {
+        log(servicesRes.data.toString());
+      } else {
+        throw Exception('Exception : Error Occured');
+      }
+    } catch (err) {
+      return err;
     }
   }
 }
