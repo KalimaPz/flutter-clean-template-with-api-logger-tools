@@ -1,4 +1,6 @@
 import 'package:arainii_app_template/api_services.dart';
+import 'package:arainii_app_template/components/alert.dart';
+import 'package:arainii_app_template/components/sx_button.dart';
 import 'package:arainii_app_template/utils/log_view.dart';
 import 'package:flutter/material.dart';
 
@@ -13,13 +15,19 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _counter = 0;
+  Alert alert = Alert();
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const LogView(),
         ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -38,6 +46,19 @@ class _HomeState extends State<Home> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            SxButton(
+              child: Text("DIALOG 1"),
+              onTap: () {
+                alert.show(context,
+                    title: "ทดสอบ", desc: "This is Spacex Dialog UI");
+              },
+            ),
+            SxButton(
+              child: Text("DIALOG 2"),
+              onTap: () {
+                alert.show(context, okOnly: true);
+              },
             ),
           ],
         ),

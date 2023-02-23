@@ -1,6 +1,7 @@
 import 'package:arainii_app_template/api_services.dart';
 import 'package:arainii_app_template/providers/example_provider.dart';
 import 'package:arainii_app_template/screens/home.dart';
+import 'package:arainii_app_template/screens/pin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         builder: EasyLoading.init(),
-        home: const Home(title: 'Flutter Demo Home Page'),
+        home: const PinPage(),
         // home: const LogView(),
       ),
     );
