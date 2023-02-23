@@ -6,12 +6,18 @@ class PinPage extends StatefulWidget {
   final int digit;
   final Color activeColor;
   final Color inactiveColor;
-  const PinPage({
-    super.key,
-    this.digit = 6,
-    this.activeColor = Colors.blue,
-    this.inactiveColor = Colors.grey,
-  });
+  final Widget? header;
+
+  final Widget? otherButton;
+  final VoidCallback? onOther;
+  const PinPage(
+      {super.key,
+      this.digit = 6,
+      this.activeColor = Colors.blue,
+      this.inactiveColor = Colors.grey,
+      this.header,
+      this.otherButton,
+      this.onOther});
 
   @override
   State<PinPage> createState() => _PinPageState();
@@ -19,41 +25,52 @@ class PinPage extends StatefulWidget {
 
 class _PinPageState extends State<PinPage> {
   String pin = "";
-  InkWell numpad(String value) {
-    return InkWell(
-      onTap: () {
-        if (value == "Del") {
-          if (pin.isNotEmpty) {
-            setState(() {
-              colors[pin.length - 1] = widget.inactiveColor;
-              pin = pin.substring(0, pin.length - 1);
-            });
+  TextButton numpad(String value,
+      {Widget? child, VoidCallback? overrideOnTap}) {
+    return TextButton(
+      style: TextButton.styleFrom(foregroundColor: Colors.grey[900]),
+      onPressed: () {
+        if (overrideOnTap == null) {
+          if (value == "Other") {
+            return;
           }
-        } else {
-          if (pin.length < widget.digit) {
-            setState(() {
-              colors[pin.length] = widget.activeColor;
-              pin += value;
-            });
+          if (value == "Del") {
+            if (pin.isNotEmpty) {
+              setState(() {
+                colors[pin.length - 1] = widget.inactiveColor;
+                pin = pin.substring(0, pin.length - 1);
+              });
+            }
+          } else {
+            if (pin.length < widget.digit) {
+              setState(() {
+                colors[pin.length] = widget.activeColor;
+                pin += value;
+              });
 
-            if (widget.digit == pin.length) {
-              log('on submit');
-              // setState(() {
-              //   colors = List.generate(
-              //       widget.digit, (index) => widget.inactiveColor);
-              //   pin = "";
-              // });
+              if (widget.digit == pin.length) {
+                log('on submit');
+                // setState(() {
+                //   colors = List.generate(
+                //       widget.digit, (index) => widget.inactiveColor);
+                //   pin = "";
+                // });
+              }
             }
           }
+        } else {
+          overrideOnTap();
         }
       },
       child: Container(
         // color: Colors.blue,
         alignment: Alignment.center,
-        child: Text(
-          value,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
+        child: child ??
+            Text(
+              value,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            ),
       ),
     );
   }
@@ -76,7 +93,7 @@ class _PinPageState extends State<PinPage> {
                 alignment: Alignment.topCenter,
                 child: Container(
                   padding: const EdgeInsets.only(top: 16),
-                  child: Text('My App'),
+                  child: widget.header,
                 )),
             Column(
               children: [
@@ -110,7 +127,7 @@ class _PinPageState extends State<PinPage> {
                   ],
                 )),
                 Container(
-                  // decoration: BoxDecoration(color: widget.inactiveColor[200]),
+                  decoration: const BoxDecoration(color: Colors.white),
                   child: GridView.count(
                     shrinkWrap: true,
                     crossAxisCount: 3,
@@ -125,9 +142,15 @@ class _PinPageState extends State<PinPage> {
                       numpad("7"),
                       numpad("8"),
                       numpad("9"),
-                      numpad(">"),
+                      widget.onOther != null
+                          ? numpad(
+                              "Other",
+                              child: widget.otherButton ?? const Text('Other'),
+                              overrideOnTap: widget.onOther,
+                            )
+                          : Container(),
                       numpad("0"),
-                      numpad("Del"),
+                      numpad("Del", child: const Icon(Icons.backspace)),
                     ],
                   ),
                 ),
